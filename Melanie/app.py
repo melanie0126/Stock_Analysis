@@ -17,7 +17,8 @@ app = Flask(__name__)
 # Database Setup
 #################################################
 #engine = create_engine("sqlite:///db/project2.sqlite")
-app.config["SQLALCHEMY_DATABASE_URI"] =os.environ.get('DATABASE_URL', '') or "sqlite:///db/project2.sqlite"
+#app.config["SQLALCHEMY_DATABASE_URI"] =os.environ.get('DATABASE_URL', '') or "sqlite:///db/project2.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] ="sqlite:///db/project2.sqlite"
 db = SQLAlchemy(app)
 
 # reflect an existing database into a new model
