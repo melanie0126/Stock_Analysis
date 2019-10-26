@@ -46,6 +46,7 @@ Tickerdata = Base.classes.Tickerdata
 def index():
     """Return the homepage."""
     return render_template("index.html")
+    print("is there any database???")
 
 @app.route("/Metadata")
 def Meta():
