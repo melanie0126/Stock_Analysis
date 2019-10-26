@@ -1,22 +1,29 @@
 import numpy as np
-
+import os
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, Date, cast
 
 from flask import Flask, jsonify, render_template
+from flask_sqlalchemy import SQLAlchemy
+#################################################
+# Flask Setup
+#################################################
+app = Flask(__name__)
 
 
 #################################################
 # Database Setup
 #################################################
-engine = create_engine("sqlite:///db/project2.sqlite")
+#engine = create_engine("sqlite:///db/project2.sqlite")
+app.config["SQLALCHEMY_DATABASE_URI"] =os.environ.get('DATABASE_URL', '') or "sqlite:///db/project2.sqlite"
+db = SQLAlchemy(app)
 
 # reflect an existing database into a new model
 Base = automap_base()
 # reflect the tables
-Base.prepare(engine, reflect=True)
+Base.prepare(db.engine, reflect=True)
 
 # Save reference to the table
 FREDdata = Base.classes.FREDdata
@@ -27,10 +34,7 @@ Tickerdata = Base.classes.Tickerdata
 # Create our session (link) from Python to the DB
 
 
-#################################################
-# Flask Setup
-#################################################
-app = Flask(__name__)
+
 
 
 #################################################
@@ -46,8 +50,8 @@ def index():
 def Meta():
     """Return a list of all passenger names"""
     # Query all passengers
-    session = Session(engine)
-    Meta_results = session.query(Metadata.Category_Name,Metadata.Category_Number,Metadata.Category_Description).all()
+    #session = Session(engine)
+    Meta_results = db.session.query(Metadata.Category_Name,Metadata.Category_Number,Metadata.Category_Description).all()
     # Convert list of tuples into normal list
     Meta_data=[]
     for Category_Name, Category_Number, Category_Description in Meta_results:
@@ -63,10 +67,10 @@ def Meta():
 def Fred(id):
 	"""Return a list of selected FRED data"""
 	# Input parameter is Category_Number
-	session = Session(engine)
+	#session = Session(engine)
 	# x = session.query("select Value, Date, CAST(Value/MAX(Value) over() AS FLOAT) AS ValueToMax from FREDdata").all()
 	
-	FRED_results = session.query(FREDdata).filter_by(Category_Number=id).all()
+	FRED_results = db.session.query(FREDdata).filter_by(Category_Number=id).all()
 	# Convert list of tuples into normal list
 	FRED_data=[]
 	for row in FRED_results:
@@ -85,8 +89,8 @@ def Fred(id):
 def Ticker(id):
     """Return a list of all passenger names"""
     # Query all passengers
-    session = Session(engine)
-    Ticker_results = session.query(Tickerdata.Index,Tickerdata.Category_Number,Tickerdata.Date,Tickerdata.Value,Tickerdata.Volume,Tickerdata.Value_to_Max_Value_Ratio).filter_by(Category_Number=id).all()
+    #session = Session(engine)
+    Ticker_results = db.session.query(Tickerdata.Index,Tickerdata.Category_Number,Tickerdata.Date,Tickerdata.Value,Tickerdata.Volume,Tickerdata.Value_to_Max_Value_Ratio).filter_by(Category_Number=id).all()
     # Convert list of tuples into normal list
     Ticker_data=[]
     for Index, Category_Number, Date,Value, Volume, Value_to_Max_Value_Ratio in Ticker_results:
@@ -105,8 +109,8 @@ def Ticker(id):
 def Mchanges():
     """Return a list of all passenger names"""
     # Query all passengers
-    session = Session(engine)
-    Mchanges_results = session.query(
+    #session = Session(engine)
+    Mchanges_results = db.session.query(
         M_changes.Date, M_changes.xlb_value, M_changes.xlb_percentage_diff, M_changes.xlc_value, M_changes.xlc_percentage_diff, 
         M_changes.xle_value, M_changes.xle_percentage_diff, M_changes.xlf_value, M_changes.xlf_percentage_diff, 
         M_changes.xli_value, M_changes.xli_percentage_diff, M_changes.xlk_value, M_changes.xlk_percentage_diff, 
